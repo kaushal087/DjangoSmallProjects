@@ -1,0 +1,47 @@
+<!--
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
+{% if latest_question_list %}
+    <ul>
+    {% for question in latest_question_list %}
+        <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li>  
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
+
+
+-->
+
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'bookmark/style.css' %}" />
+
+<div id="tags">
+{% if tag_list %}
+    <ul>
+    {% for tagRow in tag_list %}
+        <li>{{tagRow.TagID}},{{ tagRow.Tag }}</li>  
+    {% endfor %}
+    </ul>
+
+{% else %}
+    <p>No tags are available.</p>
+{% endif %}
+</div>
+
+<div id="url">
+{% if url_list %}
+    <ul>
+    {% for urlRow in url_list %}
+        <li>{{urlRow.URLID}},{{ urlRow.URL }}</li>  
+    {% endfor %}
+    </ul>
+
+{% else %}
+    <p>No URL are available.</p>
+{% endif %}
+</div>
+
