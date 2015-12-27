@@ -16,7 +16,34 @@ def index(request):
 from django.http import HttpResponse
 
 
+"""
 class IndexView(generic.ListView):
-	model = T_Tag
+	model = T_URL
 	template_name = 'bookmark/index.html'
-	context_object_name = 'tag_list'
+	context_object_name = 'url_list'
+	"""
+"""
+class IndexView(ListView):
+context_object_name = 'home_list'    
+template_name = 'contacts/index.html'
+queryset = Individual.objects.all()
+
+def get_context_data(self, **kwargs):
+    context = super(IndexView, self).get_context_data(**kwargs)
+    context['roles'] = Role.objects.all()
+    context['venue_list'] = Venue.objects.all()
+    context['festival_list'] = Festival.objects.all()
+    # And so on for more models
+        return context
+
+"""
+class IndexView(generic.ListView):
+	context_object_name = 'url_tag_list'    
+	template_name = 'bookmark/index.html'
+	queryset = T_URL_Tag.objects.all()
+
+	def get_context_data(self, **kwargs):
+		context = super(IndexView, self).get_context_data(**kwargs)
+		context['url_list'] = T_URL.objects.all()
+		context['tag_list'] = T_Tag.objects.all()
+		return context

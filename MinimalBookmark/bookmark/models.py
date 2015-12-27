@@ -4,7 +4,6 @@ from django.db import models
 
 # Create your models here.
 
-
 @python_2_unicode_compatible
 class T_URL(models.Model):
 	URLID= models.AutoField(primary_key=True)

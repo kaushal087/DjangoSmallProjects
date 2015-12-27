@@ -19,6 +19,18 @@
 
 <link rel="stylesheet" type="text/css" href="{% static 'bookmark/style.css' %}" />
 
+
+<h1>Minimal Bookmark</h1>
+<h3>Instructions!</h3>
+<p>
+    To add new bookmark: type: url,tag1,tag2,tag3 [Add]
+    To search: type: tag in field and click [Search]
+</p>
+
+
+
+<h4>Tags</h4>
+
 <div id="tags">
 {% if tag_list %}
     <ul>
@@ -32,11 +44,16 @@
 {% endif %}
 </div>
 
+<h4>URLS</h4>
+
 <div id="url">
 {% if url_list %}
     <ul>
     {% for urlRow in url_list %}
-        <li>{{urlRow.URLID}},{{ urlRow.URL }}</li>  
+        <li>{{urlRow.URLID}},<a href="{{ urlRow.URL }}">{{ urlRow.URL }}</a>
+        <!-- <a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li> -->
+
+</li>  
     {% endfor %}
     </ul>
 
@@ -45,3 +62,16 @@
 {% endif %}
 </div>
 
+<h4>Tags and URls IDs</h4>
+
+<div id="url">
+{% if url_tag_list %}
+    <ul>
+    {% for urlTagRow in url_tag_list %}
+        <li>{{urlTagRow.URLID}},{{ urlTagRow.TAGID }}</li>  
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No URL are available.</p>
+{% endif %}
+</div>
