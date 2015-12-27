@@ -27,9 +27,3 @@ urlpatterns = [
     url(r'^', include('bookmark.urls', namespace="bookmark")),
     url(r'^admin/', admin.site.urls),
 ]
-"""
-urlpatterns = [
-    url(r'^polls/', include('polls.urls', namespace="polls")),
-    url(r'^admin/', admin.site.urls),
-]
-"""
