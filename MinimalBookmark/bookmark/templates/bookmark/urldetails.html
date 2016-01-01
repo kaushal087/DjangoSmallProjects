@@ -1,0 +1,25 @@
+<div id="url">
+{% if url_list %}
+    
+    {% for urlRow in url_list %}
+        <b>URL:</b> <a href="{{ urlRow.URL }}">{{ urlRow.URL }}</a>
+    {% endfor %}
+
+{% else %}
+    <p>No URL are available.</p>
+{% endif %}
+</div>
+
+
+<div id="tag">
+{% if tag_list %}
+
+<b>Tags: </b><br/>
+    {% for tag in tag_list %}
+        {{tag}}<br/>
+    {% endfor %}
+
+{% else %}
+    <p>No Tags are available.</p>
+{% endif %}
+</div>

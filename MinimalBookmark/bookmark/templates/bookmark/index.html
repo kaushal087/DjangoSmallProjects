@@ -48,14 +48,18 @@
 
 <div id="url">
 {% if url_list %}
-    <ul>
+    <table>
     {% for urlRow in url_list %}
-        <li>{{urlRow.URLID}},<a href="{{ urlRow.URL }}">{{ urlRow.URL }}</a>
-        <!-- <a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li> -->
-
-</li>  
+    <tr>
+        <td>{{urlRow.URLID}},<a href="{{ urlRow.URL }}">{{ urlRow.URL }}</a></td>
+        <td>
+        <a href = "/bookmark/{{urlRow.URLID}}">Show</a> 
+        <a href = "/bookmark/{{urlRow.URLID}}/edit">Edit</a> 
+        <a href = "/bookmark/{{urlRow.URLID}}/destroy">Destroy</a>
+  </td>
+</tr>
     {% endfor %}
-    </ul>
+    </table>
 
 {% else %}
     <p>No URL are available.</p>
