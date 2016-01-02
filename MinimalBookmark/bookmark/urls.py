@@ -12,5 +12,8 @@ urlpatterns = [
     url(r'^tags/new/insertTagAndShow/$', views.insertTagAndShow, name='InsertTagAndShow'),
     url(r'^tags/(?P<tag_id>[0-9]+)/edit$', views.editTag, name='editTag'),
     url(r'^tags/updateTagAndShow/(?P<tag_id>[0-9]+)/$', views.updateTagAndShow, name='updateTag'),
+    url(r'^bookmark/(?P<url_id>[0-9]+)/edit$', views.editURL, name='editURL'),
+    url(r'^bookmark/updateBookmarkAndShow/(?P<url_id>[0-9]+)/$', views.updateBookmarkAndShow, name='updateBookmarkAndShow'),
+
 ]
 

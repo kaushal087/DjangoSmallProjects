@@ -14,6 +14,75 @@ import requests
 import urllib2
 #soup = BeautifulSoup(html_doc, 'html.parser')
 
+def updateBookmarkAndShow(request, url_id):
+	print request.POST
+
+	#newTag =  str(request.POST['newTag'])
+	updatedURL = str(request.POST['updatedURL'])
+	TagIDList = request.POST.getlist('selectedIds[]')
+
+	obj = T_URL_Tag.objects.filter(URLID=int(str(url_id))).delete()
+
+	url_id = str(url_id)
+
+	#user = User.objects.only('id').get(id=data['user_id'])
+
+	u = T_URL.objects.only('URLID').get( URLID=url_id )
+	print type(u), u
+
+	for TagID in TagIDList:
+		tag_id = str(TagID)
+		t = T_Tag.objects.only('TagID').get(TagID= tag_id)
+		print type(t), t
+		obj = T_URL_Tag.objects.create( URLID=u, TAGID=t )
+		obj.save()
+
+
+
+	#print updatedURL
+	#print TagIDList
+
+	#TagIDList = request.POST.selectedIds
+
+	#print updatedURL
+	#print TagIDList
+	#delete row from T_URL_Tag
+	#insert row into T_URL_Tag
+
+
+
+
+	return HttpResponseRedirect('/bookmark/' + str(url_id) +'/')
+
+def editURL(request, url_id):
+	tag_list =  T_Tag.objects.all()
+	url_list = T_URL.objects.filter(URLID=url_id)
+	tag_associated_list = T_URL_Tag.objects.filter(URLID=url_id)
+
+	for url_row in url_list:
+		url = str(url_row.URL)
+	print url
+
+	TagIDList = []
+
+	for tag_row in tag_associated_list:
+		TagID = int(str(tag_row.TAGID))
+		TagIDList.append(TagID)
+
+	print TagIDList
+
+
+
+
+	context = {
+		'TagIDList':TagIDList,
+		'tag_list':tag_list,
+		'URL':url,
+		'URLID':url_id,
+		'tag_associated_list':tag_associated_list,
+	}
+	return render(request, 'bookmark/editURL.html', context)
+
 def updateTagAndShow(request, tag_id):
 	if (request.method == 'POST'):
 		updatedTag =  str(request.POST['updatedTag'])
@@ -91,7 +160,7 @@ def showDetails(request, url_id):
 			a= int(str(tag_row.TagID))
 			b = int(str(url_tag_row.TAGID))
 			if( a == b):
-				print a, type(a)
+				#print a, type(a)
 				tags.append(str(tag_row.Tag)) 
 
 	url = "abc"
