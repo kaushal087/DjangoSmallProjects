@@ -1,22 +1,7 @@
-<!--
 {% load staticfiles %}
-
-<link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
-{% if latest_question_list %}
-    <ul>
-    {% for question in latest_question_list %}
-        <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li>  
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No polls are available.</p>
-{% endif %}
-
-
--->
-
-{% load staticfiles %}
-
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 <link rel="stylesheet" type="text/css" href="{% static 'bookmark/style.css' %}" />
 
 
@@ -28,16 +13,26 @@
 </p>
 
 
+<form class="form-inline" method="POST">
+  {% csrf_token %}
+  <div class="form-group ">
+    <input type="text" class="form-control col-sm-8" id="inputString" placeholder="To add <Url>,<Tag1>,<Tag2>,<Tag3>,.., | To search <Tag>">
+  </div>
+  <button type="submit" class="btn btn-default">Search</button>
+</form>
 
 <h4>Tags</h4>
 
+<a href = "/tags">edit</a>
+
+
 <div id="tags">
 {% if tag_list %}
-    <ul>
+    
     {% for tagRow in tag_list %}
-        <li>{{tagRow.TagID}},{{ tagRow.Tag }}</li>  
+        {{tagRow.TagID}},{{ tagRow.Tag }} ::   
     {% endfor %}
-    </ul>
+    
 
 {% else %}
     <p>No tags are available.</p>

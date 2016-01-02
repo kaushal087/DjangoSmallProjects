@@ -1,0 +1,16 @@
+{% load staticfiles %}
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'bookmark/style.css' %}" />
+
+
+
+
+<form class="form-inline" action="insertTagAndShow/" method="POST">
+{% csrf_token %}
+  <div class="form-group">
+    <input type="text" class="form-control " id="inputString" name="newTag" placeholder="New Tag">
+  </div>
+  <button type="submit" class="btn btn-default">Add</button>
+</form>

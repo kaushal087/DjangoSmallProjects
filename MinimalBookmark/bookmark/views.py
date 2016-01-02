@@ -8,49 +8,63 @@ from .models import T_Tag
 from .models import T_URL
 from .models import T_URL_Tag
 
-"""
-# Create your views here.
-def index(request):
-	return HttpResponse("Minimal Bookmark")
-"""
-from django.http import HttpResponse
+#from bs4 import BeautifulSoup
+from  BeautifulSoup import BeautifulSoup
+import requests
+import urllib2
+#soup = BeautifulSoup(html_doc, 'html.parser')
+
+def updateTagAndShow(request, tag_id):
+	if (request.method == 'POST'):
+		updatedTag =  str(request.POST['updatedTag'])
+
+		obj = T_Tag.objects.get(TagID=tag_id)
+		obj.Tag = updatedTag
+		print obj
+		obj.save()
+	return HttpResponseRedirect('/tags/' + str(tag_id) +'/')
+
+def editTag(request, tag_id):
+	tag_list =  T_Tag.objects.filter(TagID=tag_id)
+
+	for tag_row in tag_list:
+		Tag = str(tag_row.Tag)
+		TagID = int(str(tag_row.TagID))
+	
+	context = {
+		'Tag': Tag,
+		'TagID':TagID,
+	}
+	return render(request, 'bookmark/editTag.html', context)
+
+def insertTagAndShow(request):
+	if (request.method == 'POST'):
+		newTag =  str(request.POST['newTag'])
+		obj = T_Tag.objects.create(Tag=newTag)
+		obj.save()
+		print obj.TagID
+	return HttpResponseRedirect('/tags/' + str(obj.TagID))
+
+def addTag(request):
+	context = {}
+	return render(request,'bookmark/addTag.html', context)
 
 
-"""
-class IndexView(generic.ListView):
-	model = T_URL
-	template_name = 'bookmark/index.html'
-	context_object_name = 'url_list'
-	"""
-"""
-class IndexView(ListView):
-context_object_name = 'home_list'    
-template_name = 'contacts/index.html'
-queryset = Individual.objects.all()
+def showTags(request):
+	tag_list =  T_Tag.objects.all()
+	context = {
+	'tag_list': tag_list,
+	}
+	return render(request,'bookmark/tags.html', context)
 
-def get_context_data(self, **kwargs):
-    context = super(IndexView, self).get_context_data(**kwargs)
-    context['roles'] = Role.objects.all()
-    context['venue_list'] = Venue.objects.all()
-    context['festival_list'] = Festival.objects.all()
-    # And so on for more models
-        return context
-
-"""
-"""
-class IndexView(generic.ListView):
-	context_object_name = 'url_tag_list'    
-	template_name = 'bookmark/index.html'
-	queryset = T_URL_Tag.objects.all()
-
-	def get_context_data(self, **kwargs):
-		context = super(IndexView, self).get_context_data(**kwargs)
-		context['url_list'] = T_URL.objects.all()
-		context['tag_list'] = T_Tag.objects.all()
-		return context
-"""
-
-
+def showTag(request, tag_id):
+	tag_list =  T_Tag.objects.filter(TagID=tag_id)
+	isNewTag = False
+	context = {
+	'isNewTag': isNewTag,
+	'tag_list': tag_list,
+	}
+	return render(request,'bookmark/tag.html', context)
 
 
 def showHome(request):
@@ -58,27 +72,18 @@ def showHome(request):
 	url_list = T_URL.objects.all()
 	tag_list = T_Tag.objects.all()
 	url_tag_list = T_URL_Tag.objects.all()
-	print url_list
-	print tag_list
-
-
 	context = {
 		'url_list': url_list,
 		'tag_list': tag_list,
 		'url_tag_list': url_tag_list,
 	}
 	return render(request,'bookmark/index.html', context)
-#	return HttpResponse(template.render(context, request))
-
 
 
 def showDetails(request, url_id):
 	url_list = T_URL.objects.filter(URLID=url_id)
 	url_tag_list = T_URL_Tag.objects.filter(URLID=url_id)
 	tag_list = T_Tag.objects.all()
-	print tag_list
-	print url_tag_list
-
 	tags = []
 	
 	for url_tag_row in url_tag_list:
@@ -89,46 +94,22 @@ def showDetails(request, url_id):
 				print a, type(a)
 				tags.append(str(tag_row.Tag)) 
 
-	print tags
-	
+	url = "abc"
+	for url_row in url_list:
+		url  = str(url_row.URL)
+
+	urlPage = BeautifulSoup(urllib2.urlopen(url))
+	if(urlPage.title == None):
+		title = 'No title'
+	else:
+		title = urlPage.title.string
+
 	tag_list = tags
-	
+
 	context = {
 		'url_list': url_list,
 		'tag_list': tag_list,
+		'title': title,
 	}
 	return render(request,'bookmark/urldetails.html', context)
-#	return HttpResponse(template.render(context, request))
 
-
-"""
-def showDetails(request, url_id):
-	url_rows = T_URL.objects.get(URLID=url_id)
-	template = loader.get_template('bookmark/urldetails.html')
-	context = {
-		'url_rows': url_rows,
-	}
-	return HttpResponse(template.render(context, request))
-"""
-"""
-latest_question_list = Question.objects.order_by('-pub_date')[:5]
-    template = loader.get_template('polls/index.html')
-    context = {
-        'latest_question_list': latest_question_list,
-    }
-    return HttpResponse(template.render(context, request))
-"""
-"""
-class Show(generic.ListView):
-    template_name = 'bookmark/urldetails.html'
-    context_object_name = 'url_rows'
-    queryset = T_URL.objects.all()
-    def get_context_data(self, **kwargs):
-		context = super(Show, self).get_context_data(**kwargs)
-		context['url_rows'] = T_URL.objects.get(URLID=url_id)
-		return context
-"""
-"""
-	def get_queryset(self):
-    	return Question.objects.filter(pub_date__lte=timezone.now()).order_by('-pub_date')[:5]
-"""

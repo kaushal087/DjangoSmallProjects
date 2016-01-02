@@ -1,38 +1,24 @@
 {% load staticfiles %}
+ <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 <link rel="stylesheet" type="text/css" href="{% static 'bookmark/style.css' %}" />
 
-
-<div id="url">
-{% if url_list %}
-    
-    {% for urlRow in url_list %}
-        <b>URL:</b> <a href="{{ urlRow.URL }}">{{ urlRow.URL }}</a>
-    {% endfor %}
-
-{% else %}
-    <p>No URL are available.</p>
-{% endif %}
-</div>
-<div id="title">
-
-<b>Title: </b>{{title}}
-
-</div>
-
-
-<div id="tag">
+<h2>Listing Tags</h2>
+<h4>Name</h4>
+<div id="tags">
+<table>
 {% if tag_list %}
-
-<b>Tags: </b><br/>
-    {% for tag in tag_list %}
-        {{tag}}<br/>
+    {% for tagRow in tag_list %}
+        <tr><td>{{ tagRow.Tag }}</td><td> <a href="/tags/{{tagRow.TagID}}">Show</a> <a href="/tags/{{tagRow.TagID}}/edit">Edit</a> <a href="/tags/{{tagRow.TagID}}">Destroy</a></td> </tr>
     {% endfor %}
 
 {% else %}
-    <p>No Tags are available.</p>
+    <p>No tags are available.</p>
 {% endif %}
+</table>
 </div>
+
+<a href="/tags/new/">New tag</a>
 
