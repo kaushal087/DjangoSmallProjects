@@ -4,6 +4,8 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.views import generic
 from django.utils import timezone
+from django.http import Http404
+
 from .models import T_Tag
 from .models import T_URL
 from .models import T_URL_Tag
@@ -13,6 +15,40 @@ from  BeautifulSoup import BeautifulSoup
 import requests
 import urllib2
 #soup = BeautifulSoup(html_doc, 'html.parser')
+
+def searchBookmark(request):
+	"""
+	Search TagID T_Tag table
+	Search Correspoding URLID in T_URL_Tag table
+	Search Correspoding URLID and URL T_URL table and return data as Json
+	"""
+	raise Http404("Page not found")
+
+
+def addBookmark(request):
+	addstring =  str(request.POST['urltag'])
+	addstring =  addstring.split(',')
+	
+	URL = str(addstring[0])
+
+	# insert URL and store URLID in URLID variable 	
+	objURL = T_URL.objects.create(URL=URL)
+	objURL.save()
+	URLID = objURL.URLID
+	u = T_URL.objects.only('URLID').get( URLID=URLID )
+
+	#insert or get Tag obj
+	for Tag in addstring[1:]:
+		Tag = str(Tag)
+		objTag, tagCreated = T_Tag.objects.get_or_create(Tag=Tag)
+		objTag.save()
+		TagID = objTag.TagID
+		t = T_Tag.objects.only('TagID').get(TagID= TagID)
+		obj = T_URL_Tag.objects.create( URLID=u, TAGID=t )
+		obj.save()
+
+	return HttpResponseRedirect('../')
+
 
 def updateBookmarkAndShow(request, url_id):
 	print request.POST
@@ -154,7 +190,10 @@ def showDetails(request, url_id):
 	url_tag_list = T_URL_Tag.objects.filter(URLID=url_id)
 	tag_list = T_Tag.objects.all()
 	tags = []
-	
+
+	if(len(url_list) <1):
+		raise Http404("Page not found")
+
 	for url_tag_row in url_tag_list:
 		for tag_row in tag_list:
 			a= int(str(tag_row.TagID))
@@ -163,7 +202,6 @@ def showDetails(request, url_id):
 				#print a, type(a)
 				tags.append(str(tag_row.Tag)) 
 
-	url = "abc"
 	for url_row in url_list:
 		url  = str(url_row.URL)
 

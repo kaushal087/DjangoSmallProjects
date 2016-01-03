@@ -1,58 +1,59 @@
 {% load staticfiles %}
-<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<!-- <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"> -->
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<!-- <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>-->
 <link rel="stylesheet" type="text/css" href="{% static 'bookmark/style.css' %}" />
-
+ 
 
 <h1>Minimal Bookmark</h1>
+
 <h3>Instructions!</h3>
-<p>
-    To add new bookmark: type: url,tag1,tag2,tag3 [Add]
-    To search: type: tag in field and click [Search]
-</p>
+<ul>
+<li><b>To add new bookmark</b>:
+<b>type</b>: url<b>,</b>tag1<b>,</b>tag2<b>,</b>tag3 [Add]
+</li><li>
+<b>To search</b>:
+<b>type</b>: tag in field and click [Search]
+</li>
+</ul>
 
 
+<div id="searchbox">
 <form class="form-inline" method="POST">
   {% csrf_token %}
   <div class="form-group ">
-    <input type="text" class="form-control col-sm-8" id="inputString" placeholder="To add <Url>,<Tag1>,<Tag2>,<Tag3>,.., | To search <Tag>">
+    <input type="text" class="form-control col-sm-8" id="search" placeholder="To add <Url>,<Tag1>,<Tag2>,<Tag3>,.., | To search <Tag>" />
   </div>
-  <button type="submit" class="btn btn-default">Search</button>
+  <button type="submit" id="add-input" class="btn btn-default">Search</button>
 </form>
-
-<h4>Tags</h4>
-
-<a href = "/tags">edit</a>
+</div>
 
 
-<div id="tags">
+<div id="tagbox">
+<p><b>Tags</b> [<a href="/tags">edit</a>]</p>
 {% if tag_list %}
     
     {% for tagRow in tag_list %}
-        {{tagRow.TagID}},{{ tagRow.Tag }} ::   
+        <!-- {{tagRow.TagID}}, --><span class="tag">{{ tagRow.Tag }}</span>
     {% endfor %}
-    
-
 {% else %}
     <p>No tags are available.</p>
 {% endif %}
 </div>
 
-<h4>URLS</h4>
 
-<div id="url">
+
+<div id="resultbox">
+<h4>URLS</h4>
 {% if url_list %}
-    <table>
+    <table id="bookmark-list">
     {% for urlRow in url_list %}
     <tr>
-        <td>{{urlRow.URLID}},<a href="{{ urlRow.URL }}">{{ urlRow.URL }}</a></td>
-        <td>
-        <a href = "/bookmark/{{urlRow.URLID}}">Show</a> 
-        <a href = "/bookmark/{{urlRow.URLID}}/edit">Edit</a> 
-        <a href = "/bookmark/{{urlRow.URLID}}/destroy">Destroy</a>
-  </td>
-</tr>
+        <td><!-- {{urlRow.URLID}}, --><a href="{{ urlRow.URL }}">{{ urlRow.URL }}</a></td>
+        <td><a href = "/bookmark/{{urlRow.URLID}}">Show</a> </td>
+        <td><a href = "/bookmark/{{urlRow.URLID}}/edit">Edit</a> </td>
+        <td><a href = "/bookmark/{{urlRow.URLID}}/destroy">Destroy</a></td>
+    </tr>
     {% endfor %}
     </table>
 
@@ -61,7 +62,127 @@
 {% endif %}
 </div>
 
-<h4>Tags and URls IDs</h4>
+
+<script type="text/javascript">
+
+$("#search").bind("keyup change", function(e) {
+    // do stuff!
+    var inputString = $('#search').val();
+    console.log(inputString);
+    var tokens = inputString.split(',');
+    console.log(tokens);
+    if(tokens.length > 1)
+    {
+        $('#add-input').html("Add");
+    }
+    else if(tokens.length <= 1)
+    {
+        $('#add-input').html("Search");
+    }
+});
+
+
+
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+//var csrftoken = getCookie('csrftoken');
+
+
+$('#add-input').bind("click",function(e)
+{
+  //  var csrftoken = getCookie('csrftoken');
+        e.preventDefault();
+
+    if($('#search').val().split(',').length > 1)     // Add Url and Tag
+    {
+
+            pattern = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+            url = $('#search').val().split(',')[0]
+            if(! pattern.test(url))
+            {
+                alert("Wrong URL: "+ url);
+                return 0;
+            }
+
+
+            $.ajax({
+            url : "./addBookmark", // the endpoint
+            type : "POST", // http method
+            data : { 
+            urltag : $('#search').val(), 
+            csrfmiddlewaretoken : '{{csrf_token}}'
+             }, // data sent with the post request
+
+            // handle a successful response
+            success : function(json) {
+                // $('#post-text').val(''); // remove the value from the input
+                // console.log(json); // log the returned json to the console
+                console.log("success"); // another sanity check
+            },
+
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                // $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                //     " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+        });
+    }
+    else  // search URL and Tag and display
+    {
+            tag = $('#search').val();
+            
+            $.ajax({
+            url : "./searchBookmark", // the endpoint
+            type : "POST", // http method
+            data : { 
+            tag : tag,
+            csrfmiddlewaretoken : '{{csrf_token}}'
+             }, // data sent with the post request
+
+            // handle a successful response
+            success : function(json) {
+                // $('#post-text').val(''); // remove the value from the input
+                // console.log(json); // log the returned json to the console
+                console.log("success"); // another sanity check
+            },
+
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                // $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                //     " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+        });
+
+
+
+
+
+
+    }
+
+
+
+});
+
+</script>
+
+<!-- <h4>Tags and URls IDs</h4>
 
 <div id="url">
 {% if url_tag_list %}
@@ -74,3 +195,8 @@
     <p>No URL are available.</p>
 {% endif %}
 </div>
+ -->
+
+
+
+ 
