@@ -14,15 +14,84 @@ from .models import T_URL_Tag
 from  BeautifulSoup import BeautifulSoup
 import requests
 import urllib2
+
+from django.http import JsonResponse
+from django.core import serializers
+import json
+
+
 #soup = BeautifulSoup(html_doc, 'html.parser')
 
+# def searchBookmark(request):
+# 	"""
+# 	Search TagID T_Tag table
+# 	Search Correspoding URLID in T_URL_Tag table
+# 	Search Correspoding URLID and URL T_URL table and return data as Json
+# 	"""
+
+
+
+
+# 	print "searchBookmark"
+# 	print request.POST
+# 	raise Http404("Page not found")
+
+def destroyBookmark(request):
+	URLID = int(str((request.POST['URLID'])))
+	obj = T_URL.objects.filter(URLID=URLID).delete()
+	return HttpResponseRedirect('../')
+
+
+def destroyTag(request):
+	TagID = int(str((request.POST['TagID'])))
+	obj = T_Tag.objects.filter(TagID=TagID).delete()
+	return HttpResponseRedirect('../')
+
+
+
 def searchBookmark(request):
-	"""
-	Search TagID T_Tag table
-	Search Correspoding URLID in T_URL_Tag table
-	Search Correspoding URLID and URL T_URL table and return data as Json
-	"""
-	raise Http404("Page not found")
+	
+	print "searchBookmark"
+	Tag =str(request.POST['tag'])
+	print Tag
+	
+	tag_list = T_Tag.objects.filter(Tag=Tag)
+	
+
+	TagIDList = []
+	for tag_row in tag_list:
+		TagID = int(str(tag_row.TagID))
+
+		TagIDList.append(TagID)
+
+	#print "TagIDList", TagIDList
+	
+	URLTaglist = T_URL_Tag.objects.filter(TAGID__in=TagIDList)
+
+
+	URLIDList = []
+
+	for tag_url_row in URLTaglist:
+		URLID = int(str(tag_url_row.URLID))
+		URLIDList.append(URLID)
+
+	#print "URLIDList", URLIDList
+	
+
+	URLList = T_URL.objects.filter(URLID__in=URLIDList)
+
+	#print "URLList", URLList
+
+	data = serializers.serialize('json', URLList, fields=('URLID','URL'))
+	
+	datadict = {}
+
+	for URLrow in URLList:
+		datadict[URLrow.URLID] = URLrow.URL
+
+	jsonData = json.dumps(datadict)
+
+	return JsonResponse(jsonData, safe=False)
 
 
 def addBookmark(request):
@@ -58,6 +127,8 @@ def updateBookmarkAndShow(request, url_id):
 	TagIDList = request.POST.getlist('selectedIds[]')
 
 	obj = T_URL_Tag.objects.filter(URLID=int(str(url_id))).delete()
+	if (len(obj) < 1):
+		raise Http404("Page not found")
 
 	url_id = str(url_id)
 
@@ -73,26 +144,13 @@ def updateBookmarkAndShow(request, url_id):
 		obj = T_URL_Tag.objects.create( URLID=u, TAGID=t )
 		obj.save()
 
-
-
-	#print updatedURL
-	#print TagIDList
-
-	#TagIDList = request.POST.selectedIds
-
-	#print updatedURL
-	#print TagIDList
-	#delete row from T_URL_Tag
-	#insert row into T_URL_Tag
-
-
-
-
 	return HttpResponseRedirect('/bookmark/' + str(url_id) +'/')
 
 def editURL(request, url_id):
 	tag_list =  T_Tag.objects.all()
 	url_list = T_URL.objects.filter(URLID=url_id)
+	if (len(url_list) < 1):
+		raise Http404("Page not found")
 	tag_associated_list = T_URL_Tag.objects.filter(URLID=url_id)
 
 	for url_row in url_list:
@@ -106,9 +164,6 @@ def editURL(request, url_id):
 		TagIDList.append(TagID)
 
 	print TagIDList
-
-
-
 
 	context = {
 		'TagIDList':TagIDList,
@@ -124,6 +179,8 @@ def updateTagAndShow(request, tag_id):
 		updatedTag =  str(request.POST['updatedTag'])
 
 		obj = T_Tag.objects.get(TagID=tag_id)
+		if (len(obj) < 1):
+			raise Http404("Page not found")
 		obj.Tag = updatedTag
 		print obj
 		obj.save()
@@ -131,6 +188,8 @@ def updateTagAndShow(request, tag_id):
 
 def editTag(request, tag_id):
 	tag_list =  T_Tag.objects.filter(TagID=tag_id)
+	if (len(tag_list) < 1):
+		raise Http404("Page not found")
 
 	for tag_row in tag_list:
 		Tag = str(tag_row.Tag)
@@ -164,6 +223,9 @@ def showTags(request):
 
 def showTag(request, tag_id):
 	tag_list =  T_Tag.objects.filter(TagID=tag_id)
+	if (len(tag_list) < 1):
+		raise Http404("Page not found")
+
 	isNewTag = False
 	context = {
 	'isNewTag': isNewTag,
@@ -193,6 +255,7 @@ def showDetails(request, url_id):
 
 	if(len(url_list) <1):
 		raise Http404("Page not found")
+		return None
 
 	for url_tag_row in url_tag_list:
 		for tag_row in tag_list:

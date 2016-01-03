@@ -1,10 +1,11 @@
 {% load staticfiles %}
-<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<!-- <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"> -->
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<!-- <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>-->
 <link rel="stylesheet" type="text/css" href="{% static 'bookmark/style.css' %}" />
-
-
+ 
+<body>
+<h1>New tag</h1>
 
 
 <form class="form-inline" action="insertTagAndShow/" method="POST">
@@ -14,3 +15,6 @@
   </div>
   <button type="submit" class="btn btn-default">Add</button>
 </form>
+<a href="/tags">Back</a>
+
+</body>

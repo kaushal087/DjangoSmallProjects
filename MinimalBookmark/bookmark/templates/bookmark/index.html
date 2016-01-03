@@ -4,7 +4,7 @@
 <!-- <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>-->
 <link rel="stylesheet" type="text/css" href="{% static 'bookmark/style.css' %}" />
  
-
+<body>
 <h1>Minimal Bookmark</h1>
 
 <h3>Instructions!</h3>
@@ -52,7 +52,7 @@
         <td><!-- {{urlRow.URLID}}, --><a href="{{ urlRow.URL }}">{{ urlRow.URL }}</a></td>
         <td><a href = "/bookmark/{{urlRow.URLID}}">Show</a> </td>
         <td><a href = "/bookmark/{{urlRow.URLID}}/edit">Edit</a> </td>
-        <td><a href = "/bookmark/{{urlRow.URLID}}/destroy">Destroy</a></td>
+        <td><a href = "/bookmark/{{urlRow.URLID}}" class="destroyBookmark" value="{{urlRow.URLID}}">Destroy</a></td>
     </tr>
     {% endfor %}
     </table>
@@ -61,142 +61,169 @@
     <p>No URL are available.</p>
 {% endif %}
 </div>
-
+</body>
 
 <script type="text/javascript">
-
-$("#search").bind("keyup change", function(e) {
-    // do stuff!
-    var inputString = $('#search').val();
-    console.log(inputString);
-    var tokens = inputString.split(',');
-    console.log(tokens);
-    if(tokens.length > 1)
-    {
-        $('#add-input').html("Add");
-    }
-    else if(tokens.length <= 1)
-    {
-        $('#add-input').html("Search");
-    }
-});
+    $("#search").bind("keyup change", function(e) {
+        // do stuff!
+        var inputString = $('#search').val();
+        console.log(inputString);
+        var tokens = inputString.split(',');
+        console.log(tokens);
+        if (tokens.length > 1) {
+            $('#add-input').html("Add");
+        } else if (tokens.length <= 1) {
+            $('#add-input').html("Search");
+        }
+    });
 
 
 
-// using jQuery
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie != '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+    // using jQuery
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
             }
         }
+        return cookieValue;
     }
-    return cookieValue;
-}
-//var csrftoken = getCookie('csrftoken');
+    //var csrftoken = getCookie('csrftoken');
 
 
-$('#add-input').bind("click",function(e)
-{
-  //  var csrftoken = getCookie('csrftoken');
+
+
+    $('#add-input').bind("click", function(e) {
+        //  var csrftoken = getCookie('csrftoken');
         e.preventDefault();
 
-    if($('#search').val().split(',').length > 1)     // Add Url and Tag
-    {
+        if ($('#search').val().split(',').length > 1) // Add Url and Tag
+        {
 
             pattern = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
             url = $('#search').val().split(',')[0]
-            if(! pattern.test(url))
-            {
-                alert("Wrong URL: "+ url);
+            if (!pattern.test(url)) {
+                alert("Incorrect URL: " + url);
                 return 0;
             }
 
 
             $.ajax({
-            url : "./addBookmark", // the endpoint
-            type : "POST", // http method
-            data : { 
-            urltag : $('#search').val(), 
-            csrfmiddlewaretoken : '{{csrf_token}}'
-             }, // data sent with the post request
+                url: "./addBookmark", // the endpoint
+                type: "POST", // http method
+                data: {
+                    urltag: $('#search').val(),
+                    csrfmiddlewaretoken: '{{csrf_token}}'
+                }, // data sent with the post request
 
-            // handle a successful response
-            success : function(json) {
-                // $('#post-text').val(''); // remove the value from the input
-                // console.log(json); // log the returned json to the console
-                console.log("success"); // another sanity check
-            },
+                // handle a successful response
+                success: function(json) {
+                    // $('#post-text').val(''); // remove the value from the input
+                    // console.log(json); // log the returned json to the console
+                    console.log("success"); // another sanity check
+                    location.reload();
+                },
 
-            // handle a non-successful response
-            error : function(xhr,errmsg,err) {
-                // $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
-                //     " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
-                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-            }
-        });
-    }
-    else  // search URL and Tag and display
-    {
+                // handle a non-successful response
+                error: function(xhr, errmsg, err) {
+                    // $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                    //     " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                    console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                }
+            });
+        } else // search URL and Tag and display
+        {
             tag = $('#search').val();
-            
+
             $.ajax({
-            url : "./searchBookmark", // the endpoint
-            type : "POST", // http method
-            data : { 
-            tag : tag,
-            csrfmiddlewaretoken : '{{csrf_token}}'
-             }, // data sent with the post request
+                url: "./searchBookmark", // the endpoint
+                type: "POST", // http method
+                data: {
+                    tag: tag,
+                    csrfmiddlewaretoken: '{{csrf_token}}'
+                }, // data sent with the post request
 
-            // handle a successful response
-            success : function(json) {
-                // $('#post-text').val(''); // remove the value from the input
-                // console.log(json); // log the returned json to the console
-                console.log("success"); // another sanity check
-            },
+                // handle a successful response
+                success: function(d) {
+                    // $('#post-text').val(''); // remove the value from the input
+                    // console.log(json); // log the returned json to the console
+                    console.log("success"); // another sanity check
 
-            // handle a non-successful response
-            error : function(xhr,errmsg,err) {
-                // $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
-                //     " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
-                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-            }
-        });
+                    var data = jQuery.parseJSON(d);
+
+                    console.log(data);
 
 
 
+                    resultData = '';
+                    resultData += '<h4>URLS</h4>';
+                    resultData += '<table id="bookmark-list">';
 
+                    for (URLID in data) {
 
+                        resultData += '<tr><td> <a href="' + URLID + '">' + data[URLID] + '</a></td><td><a href = "/bookmark/' + URLID + '">Show</a> </td><td><a href = "/bookmark/' + URLID + '/edit">Edit</a> </td><td><a href = "/bookmark/' + URLID + '" class="destroyBookmark" value="' + URLID + '" >Destroy</a></td></tr>';
 
-    }
+                    }
+                    resultData += '</table>';
 
+                    $('#resultbox').html(resultData);
+                    
 
+                },
 
-});
+                // handle a non-successful response
+                error: function(xhr, errmsg, err) {
+                    // $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                    //     " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                    console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                }
+            });
+        }
+
+    });
+$(document).on("click", ".destroyBookmark", function(e){  
+    //$('.destroyBookmark').bind("click", function(e) {
+        var $this = $(this);
+        URLID = $this.attr("value");
+        console.log(URLID);
+
+        e.preventDefault();
+
+        if (!confirm("Are you sure?"))
+            return;
+        else {
+            $.ajax({
+                url: "./destroyBookmark", // the endpoint
+                type: "POST", // http method
+                data: {
+                    URLID: URLID,
+                    csrfmiddlewaretoken: '{{csrf_token}}'
+                }, // data sent with the post request
+
+                // handle a successful response
+                success: function(json) {
+                    // $('#post-text').val(''); // remove the value from the input
+                    // console.log(json); // log the returned json to the console
+                    console.log("success"); // another sanity check
+                    location.reload();
+                },
+
+                // handle a non-successful response
+                error: function(xhr, errmsg, err) {
+                    // $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                    //     " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                    console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                }
+            });
+
+        }
+    });
 
 </script>
-
-<!-- <h4>Tags and URls IDs</h4>
-
-<div id="url">
-{% if url_tag_list %}
-    <ul>
-    {% for urlTagRow in url_tag_list %}
-        <li>{{urlTagRow.URLID}},{{ urlTagRow.TAGID }}</li>  
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No URL are available.</p>
-{% endif %}
-</div>
- -->
-
-
-
- 

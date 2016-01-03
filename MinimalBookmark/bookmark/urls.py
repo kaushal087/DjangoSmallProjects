@@ -16,5 +16,7 @@ urlpatterns = [
     url(r'^bookmark/updateBookmarkAndShow/(?P<url_id>[0-9]+)/$', views.updateBookmarkAndShow, name='updateBookmarkAndShow'),
     url(r'^addBookmark$', views.addBookmark, name='addBookmark'),
     url(r'^searchBookmark$', views.searchBookmark, name='searchBookmark'),
+    url(r'^tags/destroyTag$', views.destroyTag, name='destroyTag'),
+    url(r'^destroyBookmark$', views.destroyBookmark, name='destroyBookmark'),
 ]
 
